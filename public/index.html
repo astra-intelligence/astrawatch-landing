@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstraWatch — AI-Powered Regulatory Compliance Monitoring</title>
+  <meta name="description" content="AstraWatch is an autonomous AI agent that monitors regulatory changes and delivers actionable alerts via Slack. No dashboard, no setup, no ongoing maintenance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0b;
+      --surface: #141416;
+      --surface-hover: #1c1c1f;
+      --border: #252529;
+      --text: #fafafa;
+      --text-muted: #888899;
+      --accent: #818cf8;
+      --accent-hover: #6366f1;
+      --accent-glow: rgba(129, 140, 248, 0.15);
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* Nav */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; max-width: 1200px; margin: 0 auto;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
+    .logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      padding: 100px 0 80px; text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 60%);
+    }
+    .hero-tag {
+      display: inline-block; padding: 6px 16px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--accent); margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 72px); font-weight: 800; letter-spacing: -2px;
+      line-height: 1.1; margin-bottom: 24px;
+    }
+    .hero h1 span { background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p {
+      font-size: 18px; color: var(--text-muted); max-width: 640px; margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-badges { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
+    .badge { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted); }
+    .badge svg { width: 16px; height: 16px; }
+
+    /* CTA */
+    .cta-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px;
+      border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; text-decoration: none;
+      transition: all 0.2s; cursor: pointer; border: none;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-glow); }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--surface-hover); border-color: #333; }
+
+    /* Stats */
+    .stats {
+      display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+      padding: 48px 0; border-top: 1px solid var(--border); margin-top: 60px;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+    .stat-label { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Problem */
+    .section { padding: 80px 0; }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header h2 { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
+    .section-header .subtitle { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto; }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;
+    }
+    .problem-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 32px; transition: border-color 0.2s;
+    }
+    .problem-card:hover { border-color: #333; }
+    .problem-icon { font-size: 28px; margin-bottom: 16px; }
+    .problem-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .problem-card p { color: var(--text-muted); font-size: 14px; line-height: 1.7; }
+
+    /* Features */
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;
+    }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 32px;
+    }
+    .feature-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; }
+    .feature-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p { color: var(--text-muted); font-size: 14px; line-height: 1.7; }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .pricing-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 36px; position: relative; transition: border-color 0.2s;
+    }
+    .pricing-card.featured { border-color: var(--accent); background: linear-gradient(135deg, rgba(129, 140, 248, 0.05), transparent); }
+    .pricing-card.featured::before {
+      content: 'Recommended'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: white; padding: 4px 16px; border-radius: 100px;
+      font-size: 12px; font-weight: 600;
+    }
+    .pricing-name { font-size: 16px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+    .pricing-price { font-size: 48px; font-weight: 800; letter-spacing: -2px; }
+    .pricing-price span { font-size: 18px; font-weight: 500; color: var(--text-muted); }
+    .pricing-desc { color: var(--text-muted); font-size: 14px; margin: 12px 0 24px; }
+    .pricing-features { list-style: none; margin-bottom: 28px; }
+    .pricing-features li { padding: 8px 0; font-size: 14px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+    .pricing-features li::before { content: '✓'; color: var(--green); font-weight: 700; }
+    .pricing-cta { width: 100%; text-align: center; }
+
+    /* Waitlist */
+    .waitlist-section {
+      background: radial-gradient(ellipse at 50% 50%, var(--accent-glow) 0%, transparent 60%);
+      padding: 100px 0; text-align: center;
+    }
+    .waitlist-section h2 { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
+    .waitlist-section p { color: var(--text-muted); font-size: 16px; max-width: 500px; margin: 0 auto 32px; }
+    .waitlist-form { display: flex; gap: 12px; justify-content: center; max-width: 480px; margin: 0 auto; }
+    .waitlist-form input {
+      flex: 1; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-size: 15px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .waitlist-form input:focus { border-color: var(--accent); }
+    .waitlist-form input::placeholder { color: #555; }
+    .form-note { margin-top: 16px; font-size: 13px; color: #555; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border); padding: 40px 0; text-align: center;
+    }
+    footer p { color: var(--text-muted); font-size: 13px; }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      .hero { padding: 60px 0 40px; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .waitlist-form { flex-direction: column; }
+      .nav-links { display: none; }
+      .stats { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">
+      <div class="logo-icon">👁️</div>
+      AstraWatch
+    </div>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#waitlist" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">Join Waitlist</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-tag">Autonomous AI Compliance Monitor — Pilot Program</div>
+      <h1>Regulatory changes <span>happen without warning.</span> You'll know within hours.</h1>
+      <p>AstraWatch is an autonomous AI agent that monitors 50+ regulatory sources — SEC, FTC, IRS, state agencies, and industry bodies — and delivers actionable alerts via Slack. No dashboard, no setup, no ongoing maintenance.</p>
+      <div class="hero-badges">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Slack-native
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Sub-24hr alerts
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          5-minute setup
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          No dashboard needed
+        </div>
+      </div>
+      <div class="cta-group">
+        <a href="#waitlist" class="btn btn-primary">Join the Waitlist →</a>
+        <a href="#features" class="btn btn-secondary">How It Works</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-num">13<small style="font-size:16px;color:var(--text-muted)">hrs/wk</small></div><div class="stat-label">Avg. compliance monitoring time</div></div>
+        <div class="stat"><div class="stat-num">20<small style="font-size:16px;color:var(--text-muted)">%</small></div><div class="stat-label">Revenue consumed by compliance</div></div>
+        <div class="stat"><div class="stat-num">$112<small style="font-size:16px;color:var(--text-muted)">B</small></div><div class="stat-label">Global RegTech market by 2033</div></div>
+        <div class="stat"><div class="stat-num">85<small style="font-size:16px;color:var(--text-muted)">%</small></div><div class="stat-label">Execs say complexity is increasing</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-header">
+        <h2>The Compliance Problem</h2>
+        <p class="subtitle">Small firms spend 13+ hours a week on regulatory monitoring. Enterprise solutions cost $24K+/year. There's nothing for the 99%.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">⏰</div>
+          <h3>13 Hours Wasted Weekly</h3>
+          <p>Every week, small firm leaders spend over a full workday manually checking regulatory sources, reading updates, and figuring out what applies to their business.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">💰</div>
+          <h3>Enterprise Prices, No Options</h3>
+          <p>Compliance.ai starts at $24K/yr. Thomson Reuters at $6K. There is no affordable option for firms with 5-50 employees — until now.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">📈</div>
+          <h3>Regulatory Complexity Accelerating</h3>
+          <p>EU AI Act, state-level AI regulations, SEC marketing rule updates, CCPA amendments. 79% of accounting firms expect regulatory impact to increase in the next 12 months.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features" style="background: var(--surface);">
+    <div class="container">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p class="subtitle">Zero configuration. No training. Just results delivered where you already work.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(129, 140, 248, 0.15); color: var(--accent);">🕸️</div>
+          <h3>Monitor 50+ Regulatory Sources</h3>
+          <p>SEC, FTC, IRS, PCAOB, FASB, state bar associations, state CPA boards, state insurance commissioners — and growing. Every source checked every 15 minutes.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--green);">🧠</div>
+          <h3>AI-Powered Classification</h3>
+          <p>Every change is classified by relevance (high/medium/low), mapped to your practice area (accounting, legal, financial advisory), and summarized in plain English — not legalese.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(251, 191, 36, 0.15); color: var(--amber);">⚡</div>
+          <h3>Slack Alerts in Real Time</h3>
+          <p>Critical changes arrive via Slack within 24 hours. Each alert includes the impact summary, link to source, and a clear action recommendation. No dashboard logins, no email overload.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(248, 113, 113, 0.15); color: var(--red);">🔔</div>
+          <h3>Urgency-Ranked Delivery</h3>
+          <p>High-severity changes (new regulations, enforcement actions) trigger immediate alerts. Weekly digests cover low-severity updates. You choose what needs your attention.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(129, 140, 248, 0.15); color: var(--accent);">⚙️</div>
+          <h3>5-Minute Setup</h3>
+          <p>Select your practice areas, connect Slack (or email as fallback), and you're done. AstraWatch runs autonomously — no maintenance, no updates, no dashboard visits.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(74, 222, 128, 0.15); color: var(--green);">🔒</div>
+          <h3>PI Insurer Approved</h3>
+          <p>Built for professional services firms. Professional indemnity insurers are partnering with us to offer AstraWatch to their policyholders — reducing their risk and yours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2>Pricing</h2>
+        <p class="subtitle">From solopreneur to established firm. Pay for what you need, scale as you grow.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-name">Scout</div>
+          <div class="pricing-price">$29<span>/mo</span></div>
+          <p class="pricing-desc">For solo practitioners and micro-businesses.</p>
+          <ul class="pricing-features">
+            <li>1 regulation domain</li>
+            <li>10 automated alerts/month</li>
+            <li>Email notifications</li>
+            <li>Weekly digest summary</li>
+          </ul>
+          <a href="#waitlist" class="btn btn-secondary pricing-cta">Join Waitlist</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-name">Sentinel</div>
+          <div class="pricing-price">$79<span>/mo</span></div>
+          <p class="pricing-desc">For growing firms with 2-10 team members.</p>
+          <ul class="pricing-features">
+            <li>3 regulation domains</li>
+            <li>100 alerts/month</li>
+            <li>Email + Slack notifications</li>
+            <li>Weekly digest + real-time push</li>
+            <li>Basic API access (read alerts)</li>
+          </ul>
+          <a href="#waitlist" class="btn btn-primary pricing-cta">Get Started</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Guardian</div>
+          <div class="pricing-price">$199<span>/mo</span></div>
+          <p class="pricing-desc">For established firms needing full coverage.</p>
+          <ul class="pricing-features">
+            <li>Unlimited regulation domains</li>
+            <li>Unlimited alerts</li>
+            <li>Email + Slack + Webhook notifications</li>
+            <li>Real-time monitoring engine</li>
+            <li>Full API access</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="#waitlist" class="btn btn-secondary pricing-cta">Join Waitlist</a>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 14px;">Annual billing available — 2 months free. Enterprise plans available for teams of 50+.</p>
+    </div>
+  </section>
+
+  <section class="waitlist-section" id="waitlist">
+    <div class="container">
+      <h2>Get Early Access</h2>
+      <p>Be among the first to try AstraWatch. Pilot program starting soon — limited to 3 firms. Priority access for accounting firms and legal practices.</p>
+      <form class="waitlist-form" action="https://formspree.io/f/your-form-id" method="POST">
+        <input type="email" name="email" placeholder="Enter your work email" required />
+        <button type="submit" class="btn btn-primary">Join Waitlist →</button>
+      </form>
+      <p class="form-note">No spam, no upsells, no commitment. We'll notify you when pilot slots open.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 <a href="https://astraintelligence.co">Astra Intelligence Corporation</a>. All rights reserved.</p>
+      <p style="margin-top: 8px; color: #555;">Built with Paperclip — autonomous AI operations.</p>
+    </div>
+  </footer>
+</body>
+</html>
