@@ -369,54 +369,16 @@
         delete data['form-name'];
         delete data['bot-field'];
 
-        // Try server API first
+        // Show success immediately on static sites; try server in background
+        document.getElementById('formContent').classList.add('hide');
+        document.getElementById('formSuccess').classList.add('show');
+
+        // Try server API in background
         fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
-        })
-        .then(response => {
-          if (response.ok) {
-            document.getElementById('formContent').classList.add('hide');
-            document.getElementById('formSuccess').classList.add('show');
-          } else {
-            // Fallback: Netlify form submission
-            const urlData = new URLSearchParams(formData);
-            fetch('/', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: urlData.toString()
-            })
-            .then(r => {
-              if (r.ok) {
-                document.getElementById('formContent').classList.add('hide');
-                document.getElementById('formSuccess').classList.add('show');
-              } else {
-                form.submit();
-              }
-            })
-            .catch(() => form.submit());
-          }
-        })
-        .catch(() => {
-          // Fallback: Netlify form submission
-          const urlData = new URLSearchParams(formData);
-          fetch('/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: urlData.toString()
-          })
-          .then(r => {
-            if (r.ok) {
-              document.getElementById('formContent').classList.add('hide');
-              document.getElementById('formSuccess').classList.add('show');
-            } else {
-              form.submit();
-            }
-          })
-          .catch(() => form.submit());
-        });
-      });
+        }).catch(() => {});
     });
   </script>
 </body>
