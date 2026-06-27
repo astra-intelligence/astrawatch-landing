@@ -9,9 +9,11 @@
   <meta property="og:description" content="Autonomous AI that monitors regulatory changes for small professional services firms. Slack-native alerts on SEC, FTC, IRS, and state-level changes that matter to you.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#020617">
-  <link rel="canonical" href="https://astrawatch.astraintelligence.co/">
-  <meta property="og:url" content="https://astrawatch.astraintelligence.co/">
-  <meta property="og:image" content="https://astrawatch.astraintelligence.co/og-image.png">
+  <link rel="canonical" href="https://astra-intelligence.github.io/astrawatch-landing/">
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+  <meta property="og:url" content="https://astra-intelligence.github.io/astrawatch-landing/">
+  <meta property="og:image" content="https://astra-intelligence.github.io/astrawatch-landing/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AstraWatch — AI-Powered Regulatory Monitoring">
   <meta name="twitter:description" content="Autonomous AI that monitors regulatory changes for small professional services firms. Slack-native alerts on SEC, FTC, IRS, and state-level changes.">
@@ -288,9 +290,8 @@
           <h2>Join the Early Access Waitlist</h2>
           <p>Be among the first firms to get AstraWatch. Early access participants get 30% off for the first year and help shape the product.</p>
 
-          <form name="astrawatch-waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/api/waitlist">
+          <form name="astrawatch-waitlist" method="POST" action="mailto:founders@astraintelligence.co" enctype="text/plain">
             <input type="hidden" name="form-name" value="astrawatch-waitlist" />
-            <p style="display:none"><label>Don't fill this out <input name="bot-field" /></label></p>
 
             <div class="form-row">
               <div class="form-group">
@@ -350,72 +351,15 @@
   </div>
 
   <script>
-    // Handle waitlist form submission — server API first, Netlify fallback
+    // Handle waitlist form submission
     document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('success') === 'true') {
-        document.getElementById('formContent').classList.add('hide');
-        document.getElementById('formSuccess').classList.add('show');
-      }
-
       const form = document.querySelector('form');
       if (!form) return;
 
       form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        delete data['form-name'];
-        delete data['bot-field'];
-
-        // Try server API first
-        fetch('/api/waitlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        })
-        .then(response => {
-          if (response.ok) {
-            document.getElementById('formContent').classList.add('hide');
-            document.getElementById('formSuccess').classList.add('show');
-          } else {
-            // Fallback: Netlify form submission
-            const urlData = new URLSearchParams(formData);
-            fetch('/', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: urlData.toString()
-            })
-            .then(r => {
-              if (r.ok) {
-                document.getElementById('formContent').classList.add('hide');
-                document.getElementById('formSuccess').classList.add('show');
-              } else {
-                form.submit();
-              }
-            })
-            .catch(() => form.submit());
-          }
-        })
-        .catch(() => {
-          // Fallback: Netlify form submission
-          const urlData = new URLSearchParams(formData);
-          fetch('/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: urlData.toString()
-          })
-          .then(r => {
-            if (r.ok) {
-              document.getElementById('formContent').classList.add('hide');
-              document.getElementById('formSuccess').classList.add('show');
-            } else {
-              form.submit();
-            }
-          })
-          .catch(() => form.submit());
-        });
+        // Show success state immediately (mailto will open email client)
+        document.getElementById('formContent').classList.add('hide');
+        document.getElementById('formSuccess').classList.add('show');
       });
     });
   </script>
