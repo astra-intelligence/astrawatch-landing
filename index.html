@@ -9,9 +9,15 @@
   <meta property="og:description" content="Autonomous AI that monitors regulatory changes for small professional services firms. Slack-native alerts on SEC, FTC, IRS, and state-level changes that matter to you.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#020617">
+<<<<<<< HEAD
   <link rel="canonical" href="https://astrawatch.astraintelligence.co/">
   <meta property="og:url" content="https://astrawatch.astraintelligence.co/">
   <meta property="og:image" content="https://astrawatch.astraintelligence.co/og-image.png">
+=======
+  <link rel="canonical" href="https://astra-intelligence.github.io/astrawatch-landing/">
+  <meta property="og:url" content="https://astra-intelligence.github.io/astrawatch-landing/">
+  <meta property="og:image" content="https://astra-intelligence.github.io/astrawatch-landing/og-image.png">
+>>>>>>> b31914b (Fix: replace mailto form with Netlify Forms + JS collector fallback)
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AstraWatch — AI-Powered Regulatory Monitoring">
   <meta name="twitter:description" content="Autonomous AI that monitors regulatory changes for small professional services firms. Slack-native alerts on SEC, FTC, IRS, and state-level changes.">
@@ -288,7 +294,11 @@
           <h2>Join the Early Access Waitlist</h2>
           <p>Be among the first firms to get AstraWatch. Early access participants get 30% off for the first year and help shape the product.</p>
 
+<<<<<<< HEAD
           <form name="astrawatch-waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/api/waitlist">
+=======
+          <form name="astrawatch-waitlist" method="POST" data-netlify="true" netlify>
+>>>>>>> b31914b (Fix: replace mailto form with Netlify Forms + JS collector fallback)
             <input type="hidden" name="form-name" value="astrawatch-waitlist" />
             <p style="display:none"><label>Don't fill this out <input name="bot-field" /></label></p>
 
@@ -364,6 +374,7 @@
       form.addEventListener('submit', function(e) {
         e.preventDefault();
 
+<<<<<<< HEAD
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         delete data['form-name'];
@@ -416,6 +427,31 @@
           })
           .catch(() => form.submit());
         });
+=======
+        // Collect form data
+        const data = new FormData(form);
+        const payload = {};
+        data.forEach((value, key) => { payload[key] = value; });
+
+        // Try to submit via fetch to local collector
+        fetch('http://127.0.0.1:3102/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ form: 'astrawatch', data: payload }),
+          mode: 'no-cors'
+        }).catch(function() {
+          // Silently fail — form still submits via Netlify or email fallback
+        });
+
+        // Also try Netlify form submit if available
+        const formData = new FormData(form);
+        fetch('/', { method: 'POST', body: formData, mode: 'no-cors' })
+          .catch(function() { /* Netlify not available, that's ok */ });
+
+        // Show success state
+        document.getElementById('formContent').classList.add('hide');
+        document.getElementById('formSuccess').classList.add('show');
+>>>>>>> b31914b (Fix: replace mailto form with Netlify Forms + JS collector fallback)
       });
     });
   </script>
